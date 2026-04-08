@@ -44,7 +44,6 @@ export class SimpleExtendedScientificNotation extends Notation {
   }
 
   public get isSlog(): boolean {
-    // Why does this even exist
     return false;
   }
 

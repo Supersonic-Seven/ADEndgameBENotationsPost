@@ -16,8 +16,14 @@ function formatStandard(exp: number, places: number): string {
 
   // Const STANDARD_PREFIXES_2 = ["", "MI-", "MC-", "NA-", "PC-", "FM-", "AT-", "ZP-"];
 
+  const cutMant = (10 ** (exp % 3)).toFixed(places + 1);
+  let numMant = Number(cutMant) * 10 ** (cutMant.length - 2);
+  numMant = Math.round(numMant);
+  numMant /= 10 ** (cutMant.length - 2);
+  const str = numMant.toFixed(places);
+
   if (exp < 33) {
-    return `${(10 ** (exp % 3)).toFixed(places)}${STANDARD_ABBREVIATIONS[Math.floor(exp / 3) - 1]}`;
+    return `${str} ${STANDARD_ABBREVIATIONS[Math.floor(exp / 3) - 1]}`;
   }
 
   if (exp < 3003) {
@@ -25,7 +31,7 @@ function formatStandard(exp: number, places: number): string {
     suffix += STANDARD_PREFIXES[0][Math.floor((exp - 3) % 30 / 3)];
     suffix += STANDARD_PREFIXES[1][Math.floor((exp - 3) % 300 / 30)];
     suffix += STANDARD_PREFIXES[2][Math.floor((exp - 3) / 300)];
-    return `${(10 ** (exp % 3)).toFixed(places)}${suffix}`;
+    return `${str} ${suffix}`;
   }
 
   let adjustedValue = exp;
@@ -39,7 +45,7 @@ function formatStandard(exp: number, places: number): string {
     suffixB += STANDARD_PREFIXES[0][Math.floor((adjustedValue - 3) % 30 / 3)];
     suffixB += STANDARD_PREFIXES[1][Math.floor((adjustedValue - 3) % 300 / 30)];
     suffixB += STANDARD_PREFIXES[2][Math.floor((adjustedValue - 3) % 3000 / 300)];
-    return `${(10 ** (exp % 3)).toFixed(places)}${suffixB}${suffixA}`;
+    return `${str} ${suffixB}${suffixA}`;
   }
   let suffixA = "";
   suffixA += STANDARD_PREFIXES[0][Math.floor((exp - 3) % 30 / 3)];
@@ -55,7 +61,7 @@ function formatStandard(exp: number, places: number): string {
   suffixC += STANDARD_PREFIXES[0][Math.floor((adjustedValue - 3) % 30 / 3)];
   suffixC += STANDARD_PREFIXES[1][Math.floor((adjustedValue - 3) % 300 / 30)];
   suffixC += STANDARD_PREFIXES[2][Math.floor((adjustedValue - 3) % 3000 / 300)];
-  return `${(10 ** (exp % 3)).toFixed(places)}${suffixC}${suffixB}${suffixA}`;
+  return `${str} ${suffixC}${suffixB}${suffixA}`;
 }
 export class StackedMixedScientificNotation extends Notation {
   public get name(): string {
@@ -86,7 +92,14 @@ export class StackedMixedScientificNotation extends Notation {
     } else {
       str = `${formatStandard(value.mag, places)}`;
     }
-    return `[e^${num}]e${str}`;
+    let numStr = "";
+    if (num > 1000) {
+      const logNum = Math.log10(num);
+      numStr = formatStandard(logNum, 1 + places - logNum % 3);
+    } else {
+      numStr = `${num}`;
+    }
+    return `[e^${numStr}]e${str}`;
   }
 }
 

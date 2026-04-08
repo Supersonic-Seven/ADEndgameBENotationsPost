@@ -30,20 +30,20 @@ function addCommas(value: string): string {
     .join(",");
 }
 
-function toAccuracy(value: number, accuracy: number, fancy: boolean) {
-  if (fancy || accuracy === 0) {
+function toAccuracy(value: number, accuracy: number, dropLeadingZeros: boolean) {
+  if (dropLeadingZeros || accuracy === 0) {
     const output = parseFloat(value.toPrecision(Math.max(accuracy, 1))).toString();
     return output;
   }
   return value.toPrecision(accuracy);
 }
 
-export function formatNumber(value: number, accuracy: number, fancy: boolean, poste9Acc?: number) {
-  if (value <= BigSettings.numCommas) return toAccuracy(value, accuracy, fancy);
+export function formatNumber(value: number, accuracy: number, dropLeadingZeros = true) {
+  if (value <= BigSettings.numCommas) return toAccuracy(value, accuracy, dropLeadingZeros);
   if (value <= 1e9) {
-    return addCommas(toAccuracy(value, accuracy, fancy));
+    return addCommas(toAccuracy(value, accuracy, dropLeadingZeros));
   }
-  const e9Acc = poste9Acc ?? accuracy;
+  const e9Acc = accuracy;
   const val1 = value / 10 ** Math.floor(Math.log10(value));
   const val2 = Math.floor(Math.log10(value));
   return `${toAccuracy(val1, e9Acc, false)}e${toAccuracy(val2, String(val2).length, true)}`;
@@ -70,7 +70,6 @@ export function roundExpTo(value: {mag: number; layer: number; sign: number}, ac
   return val;
 }
 
-// usefulValues converts stuffl like F9E7 -> F8E1.77e7
 export function magLayerFormatting(
   inValue: Decimal,
   accuracy: number,
@@ -82,6 +81,7 @@ export function magLayerFormatting(
     layer: inValue.layer,
     sign: inValue.sign
   };
+  // Converts stuff like F9E7 -> F8E1.77e7
   value = roundExpTo(value, accuracy);
   let output = magtext;
   if (value.sign <= 0) {
@@ -89,11 +89,11 @@ export function magLayerFormatting(
   }
   output += formatBetterMag(value.mag, accuracy);
   output += layertext;
-  output += formatNumber(value.layer - 1, String(value.layer - 1).length, false, accuracy);
+  const layerFormat = value.layer > 1e9 ? accuracy : String(value.layer - 1).length;
+  output += formatNumber(value.layer - 1, layerFormat, false);
   return output;
 }
 
-// usefulValues converts stuffl like F9E7 -> F8E1.77e7
 export function layerMagFormatting(
   inValue: Decimal,
   accuracy: number,
@@ -105,12 +105,14 @@ export function layerMagFormatting(
     layer: inValue.layer,
     sign: inValue.sign
   };
+  // Converts stuff like F9E7 -> F8E1.77e7
   value = roundExpTo(value, accuracy);
   let output = layertext;
-  if (value.sign <= 0) {
+  if (value.sign < 0) {
     output = `-${output}`;
   }
-  output += formatNumber(value.layer - 1, String(value.layer - 1).length, false, accuracy);
+  const layerFormat = value.layer > 1e9 ? accuracy : String(value.layer - 1).length;
+  output += formatNumber(value.layer - 1, layerFormat, false);
   output += magtext;
   output += formatBetterMag(value.mag, accuracy);
   return output;

@@ -328,11 +328,23 @@ describe("Stacked Mixed Scientific Notation", () => {
 
 
   it("should format all values appropriately", () => {
-    expect(notation.formatLDecimal(new Decimal("e7e23"), 2)).toBe("e700.00Sx");
-    expect(notation.formatLDecimal(new Decimal("e7e9"), 2)).toBe("e7.00B");
-    expect(notation.formatLDecimal(new Decimal("ee3e3"), 2)).toBe("e1.00NNnNe");
-    expect(notation.formatLDecimal(new Decimal("eee3e3"), 2)).toBe("ee1.00NNnNe");
-    expect(notation.formatLDecimal(new Decimal("eeee3e3"), 2)).toBe("eee1.00NNnNe");
-    expect(notation.formatLDecimal(new Decimal("eeeee3e3"), 2)).toBe("[e^3]e1.00NNnNe");
+    expect(notation.formatLDecimal(new Decimal("e7e23"), 2)).toBe("e700.00 Sx");
+    expect(notation.formatLDecimal(new Decimal("e7e9"), 2)).toBe("e7.00 B");
+    expect(notation.formatLDecimal(new Decimal("ee3e3"), 2)).toBe("e1.00 NNnNe");
+    expect(notation.formatLDecimal(new Decimal("eee3e3"), 2)).toBe("ee1.00 NNnNe");
+    expect(notation.formatLDecimal(new Decimal("eeee3e3"), 2)).toBe("eee1.00 NNnNe");
+    expect(notation.formatLDecimal(new Decimal("eeeee3e3"), 2)).toBe("[e^3]e1.00 NNnNe");
+  });
+
+  it("should format really big numbers as [e^{formatted}]...", () => {
+    expect(notation.formatLDecimal(new Decimal("(e^1.27e7)7e23"), 2)).toBe("[e^12.7 M]e700.00 Sx");
+    expect(notation.formatLDecimal(new Decimal("(e^1.27e9)7e9"), 2)).toBe("[e^1.27 B]e7.00 B");
+    expect(notation.formatLDecimal(new Decimal("(e^1.27e11)3e3"), 2)).toBe("[e^127 B]e1.00 NNnNe");
+    expect(notation.formatLDecimal(new Decimal("(e^499289374)3e3"), 2)).toBe("[e^499 M]e1.00 NNnNe");
+    expect(notation.formatLDecimal(new Decimal("(e^222234)3e3"), 2)).toBe("[e^222 K]e1.00 NNnNe");
+    // It might seem weird, but e^2996 or ^2995 wont work.
+    // This is because we need to extract 2 e's to get from 3e3 to e1.00 NNnNe
+    // Which leaves us with 2995, which then rounds to e3k
+    expect(notation.formatLDecimal(new Decimal("(e^2997)3e3"), 2)).toBe("[e^3.00 K]e1.00 NNnNe");
   });
 });
