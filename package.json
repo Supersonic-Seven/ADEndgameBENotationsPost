@@ -1,7 +1,7 @@
 {
-  "name": "adnot-beport-large",
-  "version": "1.3.3",
-  "description": "Notations used in Antimatter Dimensions, built for break_eternity.js. This set of notations is specifically built for numbers greater than 1e9e15",
+  "name": "ad-endgame-notations-large",
+  "version": "1.0.0",
+  "description": "Notations used in Antimatter Dimensions, built for AD: Endgame. This set of notations is specifically built for numbers greater than 1e9e15",
   "scripts": {
     "build": "npm run build:ad",
     "build:ad": "bili --config bili.config.base.ts && cp dist/ad-notations.min.js docs/ad-notations.min.js",
@@ -28,12 +28,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/HexaVault/BEnotations-post.git"
+    "url": "https://github.com/supersonic-seven/ADEndgameBENotationsPost.git"
   },
   "bugs": {
-    "url": "https://github.com/HexaVault/BEnotations-post/issues"
+    "url": "https://github.com/supersonic-seven/ADEndgameBENotationsPost/issues"
   },
-  "homepage": "https://github.com/HexaVault/BEnotations-post",
+  "homepage": "https://github.com/supersonic-seven/ADEndgameBENotationsPost",
   "devDependencies": {
     "@types/jest": "^27.0.2",
     "@typescript-eslint/eslint-plugin": "^4.2.0",
